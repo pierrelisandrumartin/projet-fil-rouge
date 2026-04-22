@@ -2,8 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Work;
 import com.example.demo.service.WorkService;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,7 +23,8 @@ public class WorkController {
 public List<Work> getAllWorks() {
     return workService.getAll();
 }
-
-@GetMapping("{id}")
-
+   @GetMapping("/{id}")
+public Work getById (@PathVariable int id) {
+    return workService.getById(id);
+}
 }
