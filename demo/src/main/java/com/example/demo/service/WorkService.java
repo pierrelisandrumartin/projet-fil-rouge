@@ -20,7 +20,10 @@ public class WorkService {
     }
 
     public Work getById(int id) {
-        return workRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Author not found"));
-    }
+    Work work = workRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Work not found"));
+    
+    return work;
 }
+    }
+    
