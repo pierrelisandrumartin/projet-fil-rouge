@@ -8,7 +8,7 @@ import java.util.List;
 
 @Service
 public class AuthorService {
-        private final AuthorRepository authorRepository;
+    private final AuthorRepository authorRepository;
 
     public AuthorService(AuthorRepository authorRepository) {
         this.authorRepository = authorRepository;
@@ -20,6 +20,6 @@ public class AuthorService {
 
     public Author getById(int id) {
         return authorRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Work not found"));
+                .orElseThrow(() -> new RuntimeException("Work not found"));
     }
 }

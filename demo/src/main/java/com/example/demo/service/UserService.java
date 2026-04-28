@@ -14,13 +14,13 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-    
+
     public List<User> getAll() {
         return userRepository.findAll();
     }
 
     public User getById(int id) {
         return userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found "));
+                .orElseThrow(() -> new RuntimeException("User not found "));
     }
 }

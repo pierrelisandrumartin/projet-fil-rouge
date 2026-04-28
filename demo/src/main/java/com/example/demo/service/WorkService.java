@@ -20,10 +20,9 @@ public class WorkService {
     }
 
     public Work getById(int id) {
-    Work work = workRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Work not found"));
-    
-    return work;
-}
+        Work work = workRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Work not found"));
+
+        return work;
     }
-    
+}

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Service
 public class CategoryService {
-        private final CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
     public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
@@ -20,6 +20,6 @@ public class CategoryService {
 
     public Category getById(int id) {
         return categoryRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new RuntimeException("Category not found"));
     }
 }

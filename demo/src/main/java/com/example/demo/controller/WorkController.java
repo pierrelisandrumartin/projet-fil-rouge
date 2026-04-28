@@ -15,16 +15,17 @@ public class WorkController {
 
     private final WorkService workService;
 
-    public WorkController (WorkService workService) {
+    public WorkController(WorkService workService) {
         this.workService = workService;
     }
 
     @GetMapping
-public List<Work> getAllWorks() {
-    return workService.getAll();
-}
-   @GetMapping("/{id}")
-public Work getById (@PathVariable int id) {
-    return workService.getById(id);
-}
+    public List<Work> getAllWorks() {
+        return workService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public Work getById(@PathVariable int id) {
+        return workService.getById(id);
+    }
 }
