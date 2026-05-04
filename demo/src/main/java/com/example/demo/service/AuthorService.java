@@ -20,6 +20,6 @@ public class AuthorService {
 
     public Author getById(int id) {
         return authorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Work not found"));
+                .orElseThrow(() -> new RuntimeException("Author not found"));
     }
 }
