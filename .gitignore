@@ -1,0 +1,17 @@
+# Claude Code session data
+.claude/
+
+# IDE
+.vscode/
+.idea/
+
+# Runtime logs
+logs.txt
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env.local
