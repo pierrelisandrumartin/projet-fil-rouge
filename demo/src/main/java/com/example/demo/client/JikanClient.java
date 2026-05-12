@@ -15,7 +15,7 @@ public class JikanClient {
 
     public JikanSearchResponse searchManga(String query) {
         return jikanRestClient.get()
-                .uri("/manga?q={q}&limit=10", query)
+                .uri("/manga?q={q}&limit=10&sfw=true&genres_exclude=9", query)
                 .retrieve()
                 .body(JikanSearchResponse.class);
     }
