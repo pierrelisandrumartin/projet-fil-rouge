@@ -42,7 +42,11 @@ async function apiFetch<T>(
   });
 
   if (response.status === 401 || response.status === 403) {
+    const wasAuthenticated = getToken() !== null
     clearToken();
+    if (wasAuthenticated) {
+      window.location.href = "/login"
+    }
     throw new Error("Unauthorized");
   }
 
