@@ -7,19 +7,30 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "works")
+@Table(
+    name = "works",
+    uniqueConstraints = @UniqueConstraint(
+        name = "UK_works_external",
+        columnNames = {"external_id", "source"}
+    )
+)
 public class Work {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "external_id")
+    private Integer externalId;
+
+    private String source;
 
     @NotBlank(message = "Title is required")
-    @Size(min = 1, max = 50, message = "Title must be between 1 and 50 characters")
+    @Size(min = 1, max = 255, message = "Title must be between 1 and 50 characters")
     private String title;
 
     @NotBlank(message = "Synopsis is required")
+    @Column(columnDefinition = "TEXT") 
     private String synopsis;
 
     @NotBlank(message = "Cover URL is required")

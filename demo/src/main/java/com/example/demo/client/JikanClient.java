@@ -1,8 +1,11 @@
 package com.example.demo.client;
 
+import com.example.demo.dto.jikan.JikanManga;
+import com.example.demo.dto.jikan.JikanMangaResponse;
 import com.example.demo.dto.jikan.JikanSearchResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+
 
 @Component
 public class JikanClient {
@@ -18,5 +21,17 @@ public class JikanClient {
                 .uri("/manga?q={q}&limit=10&sfw=true&genres_exclude=9", query)
                 .retrieve()
                 .body(JikanSearchResponse.class);
+    }
+
+    public JikanManga getMangaById(int id) {
+        JikanMangaResponse response = jikanRestClient.get()
+                .uri("/manga/{id}", id)
+                .retrieve()
+                .body(JikanMangaResponse.class);
+
+        if (response == null || response.getData() == null) {
+            return null;
+        }
+        return response.getData();
     }
 }
