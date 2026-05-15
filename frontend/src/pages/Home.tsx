@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { searchWorks } from "../services/api";
+import { searchWorks, importWork } from "../services/api";
 import type { WorkSearchResult } from "../types/api";
 
 const CATEGORIES = ["All", "Manga", "Webtoon", "Manhwa", "Light Novel", "Comics", "BD"];
@@ -12,6 +12,9 @@ function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+
+  const [importingId, setImportingId] = useState<number | null>(null);
+  const [importedIds, setImportedIds] = useState<Set<number>>(new Set());
 
   async function handleSearch(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -33,9 +36,21 @@ function Home() {
     }
   }
 
+  async function handleImport(work: WorkSearchResult) {
+    setImportingId(work.externalId);
+    try {
+      await importWork(work.externalId, work.source);
+      setImportedIds((prev) => new Set(prev).add(work.externalId));
+    } catch (err) {
+      console.error("Import failed:", err);
+      alert("L'import a échoué. Réessaie.");
+    } finally {
+      setImportingId(null);
+    }
+  }
+
   return (
     <div className="text-white">
-      {/* Barre de recherche dans un form */}
       <form onSubmit={handleSearch} className="flex justify-center mb-8">
         <div className="flex items-center bg-[#1A1D27] rounded-full px-4 py-2 w-full max-w-xl">
           <button
@@ -58,7 +73,6 @@ function Home() {
         </div>
       </form>
 
-      {/* Chips catégories */}
       <ul className="flex gap-2 mb-10 flex-wrap" role="list" aria-label="Filter by category">
         {CATEGORIES.map((cat) => (
           <li key={cat}>
@@ -78,14 +92,9 @@ function Home() {
         ))}
       </ul>
 
-      {/* États : loading / erreur / résultats */}
-      {loading && (
-        <p className="text-[#9A9AB0] text-center">Recherche en cours...</p>
-      )}
+      {loading && <p className="text-[#9A9AB0] text-center">Recherche en cours...</p>}
 
-      {error && (
-        <p className="text-red-400 text-center" role="alert">{error}</p>
-      )}
+      {error && <p className="text-red-400 text-center" role="alert">{error}</p>}
 
       {hasSearched && !loading && !error && (
         <section className="mb-10" aria-labelledby="results-title">
@@ -98,30 +107,50 @@ function Home() {
             <p className="text-[#9A9AB0]">Aucun résultat.</p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {results.map((work) => (
-                <article key={`${work.source}-${work.externalId}`} className="flex flex-col">
-                  {work.coverUrl ? (
-                    <img
-                      src={work.coverUrl}
-                      alt={`${work.title} cover`}
-                      className="w-full h-56 object-cover rounded-lg mb-2"
-                    />
-                  ) : (
-                    <div className="w-full h-56 bg-[#1A1D27] rounded-lg flex items-center justify-center text-[#9A9AB0] text-xs mb-2">
-                      No cover
-                    </div>
-                  )}
-                  <span className="text-xs bg-[#7C5CBF] self-start px-2 py-0.5 rounded text-white mb-1">
-                    {work.type}
-                  </span>
-                  <p className="text-sm font-medium truncate" title={work.title}>
-                    {work.title}
-                  </p>
-                  <p className="text-xs text-[#9A9AB0]">
-                    {work.volumes ? `${work.volumes} tomes` : work.status}
-                  </p>
-                </article>
-              ))}
+              {results.map((work) => {
+                const isImporting = importingId === work.externalId;
+                const isImported = importedIds.has(work.externalId);
+
+                return (
+                  <article key={`${work.source}-${work.externalId}`} className="flex flex-col">
+                    {work.coverUrl ? (
+                      <img
+                        src={work.coverUrl}
+                        alt={`${work.title} cover`}
+                        className="w-full h-56 object-cover rounded-lg mb-2"
+                      />
+                    ) : (
+                      <div className="w-full h-56 bg-[#1A1D27] rounded-lg flex items-center justify-center text-[#9A9AB0] text-xs mb-2">
+                        No cover
+                      </div>
+                    )}
+                    <span className="text-xs bg-[#7C5CBF] self-start px-2 py-0.5 rounded text-white mb-1">
+                      {work.type}
+                    </span>
+                    <p className="text-sm font-medium truncate mb-1" title={work.title}>
+                      {work.title}
+                    </p>
+                    <p className="text-xs text-[#9A9AB0] mb-2">
+                      {work.volumes ? `${work.volumes} tomes` : work.status}
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() => handleImport(work)}
+                      disabled={isImporting || isImported}
+                      className={`text-xs py-1 rounded-full font-medium transition-colors
+                        ${isImported
+                          ? "bg-[#252836] text-[#9A9AB0] cursor-default"
+                          : isImporting
+                          ? "bg-[#7C5CBF] text-white opacity-50 cursor-wait"
+                          : "bg-[#7C5CBF] text-white hover:bg-[#6a4dab] cursor-pointer"
+                        }`}
+                    >
+                      {isImported ? "✓ Ajouté" : isImporting ? "..." : "+ Ajouter"}
+                    </button>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
