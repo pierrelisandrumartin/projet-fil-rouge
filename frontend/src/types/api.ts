@@ -25,3 +25,16 @@ export interface WorkSearchResult {
     type: string;
     coverUrl: string | null;
 }
+
+export interface LibraryItem {
+  workId: number;
+  title: string;
+  synopsis: string;
+  coverUrl: string;
+  status: string;
+  type: string;
+  totalVolumes: number;
+  totalChapters: number;
+  currentVolume: number;
+  currentChapter: number;   
+}

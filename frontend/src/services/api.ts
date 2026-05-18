@@ -1,5 +1,6 @@
 import type {
   AuthResponse,
+  LibraryItem,
   LoginRequest,
   RegisterRequest,
   WorkSearchResult,
@@ -84,4 +85,8 @@ export function importWork(externalId: number, source: string): Promise<unknown>
     method: "POST",
     body: JSON.stringify({ externalId, source }),
   });
+}
+
+export function getMyLibrary(): Promise<LibraryItem[]> {
+  return apiFetch<LibraryItem[]>("/works/my");
 }

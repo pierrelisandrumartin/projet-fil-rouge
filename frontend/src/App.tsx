@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import MyListPage from "./pages/MyListPage";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
                   <main className="ml-60 flex-1 p-8">
                     <Routes>
                       <Route path="/" element={<Home />} />
+                      <Route path="/mylist" element={<MyListPage />} />
                     </Routes>
                   </main>
                 </div>
