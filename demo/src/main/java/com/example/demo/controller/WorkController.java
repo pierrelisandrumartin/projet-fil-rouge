@@ -12,6 +12,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import com.example.demo.dto.LibraryItem;
+import com.example.demo.service.ProgressService;
 
 import java.util.List;
 
@@ -23,15 +25,18 @@ public class WorkController {
     private final WorkSearchService workSearchService;
     private final WorkImportService workImportService;
     private final UserService userService;
+    private final ProgressService progressService;
 
     public WorkController(WorkService workService,
-                          WorkSearchService workSearchService,
-                          WorkImportService workImportService,
-                          UserService userService) {
+            WorkSearchService workSearchService,
+            WorkImportService workImportService,
+            UserService userService,
+            ProgressService progressService) {
         this.workService = workService;
         this.workSearchService = workSearchService;
         this.workImportService = workImportService;
         this.userService = userService;
+        this.progressService = progressService;
     }
 
     @GetMapping
@@ -49,9 +54,16 @@ public class WorkController {
         return workSearchService.search(query);
     }
 
+    @GetMapping("/my")
+    public List<LibraryItem> getMyLibrary(Authentication authentication) {
+        String email = authentication.getName();
+        User currentUser = userService.findByEmail(email);
+        return progressService.getUserLibrary(currentUser);
+    }
+
     @PostMapping("/import")
     public ResponseEntity<Work> importWork(@Valid @RequestBody ImportRequest request,
-                                           Authentication authentication) {
+            Authentication authentication) {
         if (!"jikan".equals(request.getSource())) {
             throw new RuntimeException("Source not supported: " + request.getSource());
         }
