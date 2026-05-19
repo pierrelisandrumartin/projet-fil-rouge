@@ -56,6 +56,10 @@ async function apiFetch<T>(
     throw new Error(`API error ${response.status}: ${errorBody}`);
   }
 
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   return response.json() as Promise<T>;
 }
 
@@ -99,5 +103,11 @@ export function updateProgress(
   return apiFetch<unknown>(`/progress/${progressId}`, {
     method: "PUT",
     body: JSON.stringify({ currentVolume, currentChapter }),
+  });
+}
+
+export function removeFromLibrary(progressId: number): Promise<unknown> {
+  return apiFetch<unknown>(`/progress/${progressId}`, {
+    method: "DELETE",
   });
 }

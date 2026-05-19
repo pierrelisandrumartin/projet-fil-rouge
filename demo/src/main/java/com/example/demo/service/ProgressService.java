@@ -43,10 +43,23 @@ public class ProgressService {
         return progressRepository.save(progress);
     }
 
-    public void delete(int id) {
-        log.info("Deleting progress with id: {}", id);
-        progressRepository.deleteById(id);
+    public void delete(int id, User currentUser) {
+    log.info("Deleting progress with id: {} for user: {}", id, currentUser.getId());
+
+    Progress existing = progressRepository.findById(id)
+            .orElseThrow(() -> {
+                log.warn("Progress not found for delete with id: {}", id);
+                return new RuntimeException("Progress not found");
+            });
+
+    if (existing.getUser().getId() != currentUser.getId()) {
+        log.warn("User {} tried to delete progress {} that doesn't belong to them",
+                currentUser.getId(), id);
+        throw new ForbiddenException();
     }
+
+    progressRepository.deleteById(id);
+}
 
     public Progress update(int id, ProgressUpdateRequest request, User currentUser) {
         log.debug("Updating progress with id: {} for user: {}", id, currentUser.getId());

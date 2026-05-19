@@ -5,6 +5,8 @@ import com.example.demo.model.Progress;
 import com.example.demo.model.User;
 import com.example.demo.service.ProgressService;
 import com.example.demo.service.UserService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +54,10 @@ public class ProgressController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable int id) {
-        progressService.delete(id);
-    }
+public ResponseEntity<Void> delete(@PathVariable int id, Authentication authentication) {
+    String email = authentication.getName();
+    User currentUser = userService.findByEmail(email);
+    progressService.delete(id, currentUser);
+    return ResponseEntity.noContent().build();
+}
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getMyLibrary, updateProgress } from "../services/api";
+import { getMyLibrary, removeFromLibrary, updateProgress } from "../services/api";
 import type { LibraryItem } from "../types/api";
 
 function MyListPage() {
@@ -33,16 +33,15 @@ function MyListPage() {
   async function changeField(
     item: LibraryItem,
     field: "currentVolume" | "currentChapter",
-    delta: number,
+    delta: number
   ) {
     const newValue = Math.max(0, item[field] + delta);
     if (newValue === item[field]) return;
 
-    // Optimistic update
     setItems((prev) =>
       prev.map((i) =>
-        i.progressId === item.progressId ? { ...i, [field]: newValue } : i,
-      ),
+        i.progressId === item.progressId ? { ...i, [field]: newValue } : i
+      )
     );
 
     setUpdatingIds((prev) => new Set(prev).add(item.progressId));
@@ -53,18 +52,13 @@ function MyListPage() {
           ? { currentVolume: newValue, currentChapter: item.currentChapter }
           : { currentVolume: item.currentVolume, currentChapter: newValue };
 
-      await updateProgress(
-        item.progressId,
-        payload.currentVolume,
-        payload.currentChapter,
-      );
+      await updateProgress(item.progressId, payload.currentVolume, payload.currentChapter);
     } catch (err) {
       console.error("Update failed:", err);
-      // Rollback
       setItems((prev) =>
         prev.map((i) =>
-          i.progressId === item.progressId ? { ...i, [field]: item[field] } : i,
-        ),
+          i.progressId === item.progressId ? { ...i, [field]: item[field] } : i
+        )
       );
       alert("La mise à jour a échoué. Réessaie.");
     } finally {
@@ -73,6 +67,23 @@ function MyListPage() {
         next.delete(item.progressId);
         return next;
       });
+    }
+  }
+
+  async function handleRemove(item: LibraryItem) {
+    const confirmed = window.confirm(`Retirer « ${item.title} » de ta liste ?`);
+    if (!confirmed) return;
+
+    const snapshot = items;
+    // Optimistic remove
+    setItems((prev) => prev.filter((i) => i.progressId !== item.progressId));
+
+    try {
+      await removeFromLibrary(item.progressId);
+    } catch (err) {
+      console.error("Remove failed:", err);
+      setItems(snapshot);
+      alert("La suppression a échoué. Réessaie.");
     }
   }
 
@@ -102,35 +113,40 @@ function MyListPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {items.map((item) => {
             const totalVol = item.totalVolumes > 0 ? item.totalVolumes : null;
-            const totalChap =
-              item.totalChapters > 0 ? item.totalChapters : null;
+            const totalChap = item.totalChapters > 0 ? item.totalChapters : null;
             const isUpdating = updatingIds.has(item.progressId);
 
-            const volMaxed =
-              totalVol !== null && item.currentVolume >= totalVol;
-            const chapMaxed =
-              totalChap !== null && item.currentChapter >= totalChap;
+            const volMaxed = totalVol !== null && item.currentVolume >= totalVol;
+            const chapMaxed = totalChap !== null && item.currentChapter >= totalChap;
 
             return (
               <article key={item.progressId} className="flex flex-col">
-                {item.coverUrl ? (
-                  <img
-                    src={item.coverUrl}
-                    alt={`${item.title} cover`}
-                    className="w-full h-56 object-cover rounded-lg mb-2"
-                  />
-                ) : (
-                  <div className="w-full h-56 bg-[#1A1D27] rounded-lg flex items-center justify-center text-[#9A9AB0] text-xs mb-2">
-                    No cover
-                  </div>
-                )}
+                <div className="relative">
+                  {item.coverUrl ? (
+                    <img
+                      src={item.coverUrl}
+                      alt={`${item.title} cover`}
+                      className="w-full h-56 object-cover rounded-lg mb-2"
+                    />
+                  ) : (
+                    <div className="w-full h-56 bg-[#1A1D27] rounded-lg flex items-center justify-center text-[#9A9AB0] text-xs mb-2">
+                      No cover
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleRemove(item)}
+                    aria-label={`Remove ${item.title} from list`}
+                    className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center bg-black/60 hover:bg-red-600 text-white rounded-full transition-colors text-sm cursor-pointer"
+                  >
+                    ×
+                  </button>
+                </div>
+
                 <span className="text-xs bg-[#7C5CBF] self-start px-2 py-0.5 rounded text-white mb-1">
                   {item.type}
                 </span>
-                <p
-                  className="text-sm font-medium truncate mb-2"
-                  title={item.title}
-                >
+                <p className="text-sm font-medium truncate mb-2" title={item.title}>
                   {item.title}
                 </p>
 
