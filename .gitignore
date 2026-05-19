@@ -15,3 +15,7 @@ Thumbs.db
 
 # Env
 .env.local
+
+# Frontend build artifacts
+frontend/dist/
+frontend/dist.zip
