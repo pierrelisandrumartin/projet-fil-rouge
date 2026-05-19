@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { searchWorks, importWork } from "../services/api";
+import { searchWorks, importWork, getMyLibrary } from "../services/api";
 import type { WorkSearchResult } from "../types/api";
 
 const CATEGORIES = ["All", "Manga", "Webtoon", "Manhwa", "Light Novel", "Comics", "BD"];
@@ -15,6 +15,31 @@ function Home() {
 
   const [importingId, setImportingId] = useState<number | null>(null);
   const [importedIds, setImportedIds] = useState<Set<number>>(new Set());
+
+    useEffect(() => {
+  let cancelled = false;
+
+  async function preloadLibrary() {
+    try {
+      const library = await getMyLibrary();
+      if (cancelled) return;
+
+      const jikanIds = library
+        .filter((item) => item.source === "jikan" && item.externalId !== null)
+        .map((item) => item.externalId as number);
+
+      setImportedIds(new Set(jikanIds));
+    } catch (err) {
+      console.error("Failed to preload library:", err);
+      // On échoue silencieusement : la page reste utilisable
+    }
+  }
+
+  preloadLibrary();
+  return () => {
+    cancelled = true;
+  };
+}, []);
 
   async function handleSearch(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();

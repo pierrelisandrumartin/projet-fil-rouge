@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.LibraryItem;
+import com.example.demo.dto.ProgressUpdateRequest;
+import com.example.demo.exception.ForbiddenException;
 import com.example.demo.model.Progress;
 import com.example.demo.model.User;
 import com.example.demo.model.Work;
@@ -46,17 +48,23 @@ public class ProgressService {
         progressRepository.deleteById(id);
     }
 
-    public Progress update(int id, Progress updated) {
-        log.debug("Updating progress with id: {}", id);
+    public Progress update(int id, ProgressUpdateRequest request, User currentUser) {
+        log.debug("Updating progress with id: {} for user: {}", id, currentUser.getId());
+
         Progress existing = progressRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Progress not found for update with id: {}", id);
                     return new RuntimeException("Progress not found");
                 });
-        log.debug("Setting current volume to: {} and chapter to: {}",
-                updated.getCurrentVolume(), updated.getCurrentChapter());
-        existing.setCurrentVolume(updated.getCurrentVolume());
-        existing.setCurrentChapter(updated.getCurrentChapter());
+
+        if (existing.getUser().getId() != currentUser.getId()) {
+            log.warn("User {} tried to modify progress {} that doesn't belong to them",
+                    currentUser.getId(), id);
+            throw new ForbiddenException();
+        }
+
+        existing.setCurrentVolume(request.getCurrentVolume());
+        existing.setCurrentChapter(request.getCurrentChapter());
         return progressRepository.save(existing);
     }
 
@@ -72,7 +80,10 @@ public class ProgressService {
         String categoryName = (work.getCategory() != null) ? work.getCategory().getName() : "Unknown";
 
         return new LibraryItem(
+                progress.getId(),
                 work.getId(),
+                work.getExternalId(),
+                work.getSource(),
                 work.getTitle(),
                 work.getSynopsis(),
                 work.getCoverUrl(),

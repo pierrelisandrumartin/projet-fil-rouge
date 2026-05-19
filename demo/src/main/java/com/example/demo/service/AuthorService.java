@@ -22,4 +22,4 @@ public class AuthorService {
         return authorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Author not found"));
     }
-}
+}   

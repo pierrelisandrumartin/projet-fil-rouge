@@ -8,7 +8,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LibraryItem {
+
+    private int progressId;
     private int workId;
+    private Integer externalId;
+    private String source;
     private String title;
     private String synopsis;
     private String coverUrl;

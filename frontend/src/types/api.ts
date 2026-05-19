@@ -27,7 +27,10 @@ export interface WorkSearchResult {
 }
 
 export interface LibraryItem {
+  progressId: number;
   workId: number;
+  externalId: number | null;
+  source: string | null;
   title: string;
   synopsis: string;
   coverUrl: string;

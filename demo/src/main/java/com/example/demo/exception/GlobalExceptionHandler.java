@@ -15,79 +15,92 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidCredentials(
-            InvalidCredentialsException ex,
-            WebRequest request) {
+        @ExceptionHandler(InvalidCredentialsException.class)
+        public ResponseEntity<ErrorResponse> handleInvalidCredentials(
+                        InvalidCredentialsException ex,
+                        WebRequest request) {
 
-        log.warn("Invalid credentials attempt on path: {}", request.getDescription(false));
+                log.warn("Invalid credentials attempt on path: {}", request.getDescription(false));
 
-        ErrorResponse errorResponse = new ErrorResponse(
-            HttpStatus.UNAUTHORIZED.value(),
-            ex.getMessage(),
-            "Unauthorized",
-            LocalDateTime.now(),
-            request.getDescription(false).replace("uri=", "")
-        );
+                ErrorResponse errorResponse = new ErrorResponse(
+                                HttpStatus.UNAUTHORIZED.value(),
+                                ex.getMessage(),
+                                "Unauthorized",
+                                LocalDateTime.now(),
+                                request.getDescription(false).replace("uri=", ""));
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
-    }
+                return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+        }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(
-            MethodArgumentNotValidException ex,
-            WebRequest request) {
+        @ExceptionHandler(ForbiddenException.class)
+        public ResponseEntity<ErrorResponse> handleForbidden(
+                        ForbiddenException ex,
+                        WebRequest request) {
 
-        String message = ex.getBindingResult().getFieldErrors().stream()
-            .map(error -> error.getField() + ": " + error.getDefaultMessage())
-            .collect(Collectors.joining(", "));
+                log.warn("Forbidden access on path: {}", request.getDescription(false));
 
-        log.warn("Validation error: {}", message);
+                ErrorResponse errorResponse = new ErrorResponse(
+                                HttpStatus.FORBIDDEN.value(),
+                                ex.getMessage(),
+                                "Forbidden",
+                                LocalDateTime.now(),
+                                request.getDescription(false).replace("uri=", ""));
 
-        ErrorResponse errorResponse = new ErrorResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            "Validation failed: " + message,
-            "Bad Request",
-            LocalDateTime.now(),
-            request.getDescription(false).replace("uri=", "")
-        );
+                return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+        }
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<ErrorResponse> handleValidationException(
+                        MethodArgumentNotValidException ex,
+                        WebRequest request) {
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleRuntimeException(
-            RuntimeException ex,
-            WebRequest request) {
+                String message = ex.getBindingResult().getFieldErrors().stream()
+                                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                                .collect(Collectors.joining(", "));
 
-        log.error("RuntimeException: {}", ex.getMessage(), ex);
+                log.warn("Validation error: {}", message);
 
-        ErrorResponse errorResponse = new ErrorResponse(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            ex.getMessage(),
-            "Internal Server Error",
-            LocalDateTime.now(),
-            request.getDescription(false).replace("uri=", "")
-        );
+                ErrorResponse errorResponse = new ErrorResponse(
+                                HttpStatus.BAD_REQUEST.value(),
+                                "Validation failed: " + message,
+                                "Bad Request",
+                                LocalDateTime.now(),
+                                request.getDescription(false).replace("uri=", ""));
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGlobalException(
-            Exception ex,
-            WebRequest request) {
+        @ExceptionHandler(RuntimeException.class)
+        public ResponseEntity<ErrorResponse> handleRuntimeException(
+                        RuntimeException ex,
+                        WebRequest request) {
 
-        log.error("Unexpected error: {}", ex.getMessage(), ex);
+                log.error("RuntimeException: {}", ex.getMessage(), ex);
 
-        ErrorResponse errorResponse = new ErrorResponse(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            "An unexpected error occurred",
-            "Internal Server Error",
-            LocalDateTime.now(),
-            request.getDescription(false).replace("uri=", "")
-        );
+                ErrorResponse errorResponse = new ErrorResponse(
+                                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                ex.getMessage(),
+                                "Internal Server Error",
+                                LocalDateTime.now(),
+                                request.getDescription(false).replace("uri=", ""));
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+                return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ErrorResponse> handleGlobalException(
+                        Exception ex,
+                        WebRequest request) {
+
+                log.error("Unexpected error: {}", ex.getMessage(), ex);
+
+                ErrorResponse errorResponse = new ErrorResponse(
+                                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                "An unexpected error occurred",
+                                "Internal Server Error",
+                                LocalDateTime.now(),
+                                request.getDescription(false).replace("uri=", ""));
+
+                return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 }

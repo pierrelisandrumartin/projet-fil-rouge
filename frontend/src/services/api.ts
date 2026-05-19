@@ -90,3 +90,14 @@ export function importWork(externalId: number, source: string): Promise<unknown>
 export function getMyLibrary(): Promise<LibraryItem[]> {
   return apiFetch<LibraryItem[]>("/works/my");
 }
+
+export function updateProgress(
+  progressId: number,
+  currentVolume: number,
+  currentChapter: number
+): Promise<unknown> {
+  return apiFetch<unknown>(`/progress/${progressId}`, {
+    method: "PUT",
+    body: JSON.stringify({ currentVolume, currentChapter }),
+  });
+}
