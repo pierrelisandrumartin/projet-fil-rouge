@@ -30,6 +30,18 @@ public class WorkSearchService {
                 .collect(Collectors.toList());
     }
 
+    public List<WorkSearchResult> getTrending() {
+    JikanSearchResponse response = jikanClient.getTopManga();
+
+    if (response == null || response.getData() == null) {
+        return List.of();
+    }
+
+    return response.getData().stream()
+            .map(this::toSearchResult)
+            .collect(Collectors.toList());
+}
+
     private WorkSearchResult toSearchResult(JikanManga manga) {
         String coverUrl = null;
         if (manga.getImages() != null && manga.getImages().getJpg() != null) {

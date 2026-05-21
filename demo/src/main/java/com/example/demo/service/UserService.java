@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.RegisterRequest;
+import com.example.demo.dto.UserResponse;
 import com.example.demo.exception.InvalidCredentialsException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
@@ -9,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import javax.management.RuntimeErrorException;
 
 @Service
 public class UserService {
@@ -35,6 +34,15 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public UserResponse toResponse(User user) {
+        return new UserResponse(
+            user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getCreatedAt()
+        );
     }
 
     public User register(RegisterRequest request) {

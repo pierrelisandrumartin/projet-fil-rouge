@@ -22,6 +22,12 @@ public class JikanClient {
                 .retrieve()
                 .body(JikanSearchResponse.class);
     }
+    public JikanSearchResponse getTopManga() {
+    return jikanRestClient.get()
+            .uri("/top/manga?limit=20&sfw=true&filter=bypopularity")
+            .retrieve()
+            .body(JikanSearchResponse.class);
+}
 
     public JikanManga getMangaById(int id) {
         JikanMangaResponse response = jikanRestClient.get()

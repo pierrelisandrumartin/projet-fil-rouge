@@ -61,6 +61,11 @@ public class WorkController {
         return progressService.getUserLibrary(currentUser);
     }
 
+    @GetMapping("/trending")
+    public List<WorkSearchResult> trending() {
+        return workSearchService.getTrending();
+    }
+
     @PostMapping("/import")
     public ResponseEntity<Work> importWork(@Valid @RequestBody ImportRequest request,
             Authentication authentication) {
@@ -74,4 +79,5 @@ public class WorkController {
         Work imported = workImportService.importFromJikan(request.getExternalId(), currentUser);
         return ResponseEntity.ok(imported);
     }
+
 }
