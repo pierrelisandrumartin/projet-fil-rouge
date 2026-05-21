@@ -41,3 +41,10 @@ export interface LibraryItem {
   currentVolume: number;
   currentChapter: number;   
 }
+
+export interface UserResponse {
+    id: number;
+    username: string;
+    email: string;
+    createdAt: string;
+}

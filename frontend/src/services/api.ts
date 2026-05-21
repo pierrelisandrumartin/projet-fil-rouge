@@ -3,6 +3,7 @@ import type {
   LibraryItem,
   LoginRequest,
   RegisterRequest,
+  UserResponse,
   WorkSearchResult,
 } from "../types/api";
 
@@ -110,4 +111,12 @@ export function removeFromLibrary(progressId: number): Promise<unknown> {
   return apiFetch<unknown>(`/progress/${progressId}`, {
     method: "DELETE",
   });
+}
+
+export function getTrending(): Promise<WorkSearchResult[]> {
+  return apiFetch<WorkSearchResult[]>("/works/trending");
+}
+
+export function getCurrentUser() : Promise<UserResponse> {
+  return apiFetch<UserResponse>("/users/me");
 }
