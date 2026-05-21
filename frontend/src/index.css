@@ -1,1 +1,103 @@
-@import "tailwindcss";  
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+}
+
+:root {
+  /* Surfaces */
+  --bg: #0A0B10;
+  --surface: #14161E;
+  --surface-2: #1C1F2A;
+  --border: rgba(255, 255, 255, 0.07);
+
+  /* Text */
+  --text: #F2F2F5;
+  --text-dim: #9CA0B5;
+  --text-mute: #5F6378;
+
+  /* Accent (Rose Magenta) */
+  --accent: #F43F5E;
+  --accent-2: #FB7185;
+
+  /* Geometry */
+  --radius: 16px;
+  --radius-card: 16px;
+
+  /* Theme */
+  color-scheme: dark;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+  font-feature-settings: "ss01";
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Selection */
+::selection {
+  background: color-mix(in oklch, var(--accent) 50%, transparent);
+  color: white;
+}
+
+/* Hide scrollbars utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  scrollbar-width: none;
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(.97) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reset for buttons */
+button {
+  font-family: inherit;
+}
+
+*:focus {
+  outline: none;
+}
+
+input::placeholder {
+  color: var(--text-mute);
+}
