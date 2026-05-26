@@ -5,6 +5,7 @@ import com.example.demo.dto.UserResponse;
 import com.example.demo.exception.InvalidCredentialsException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.dto.ChangePasswordRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,11 +39,10 @@ public class UserService {
 
     public UserResponse toResponse(User user) {
         return new UserResponse(
-            user.getId(),
-            user.getUsername(),
-            user.getEmail(),
-            user.getCreatedAt()
-        );
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getCreatedAt());
     }
 
     public User register(RegisterRequest request) {
@@ -68,5 +68,14 @@ public class UserService {
         }
 
         return user;
+    }
+
+    public void changePassword(User currentUser, ChangePasswordRequest request) {
+        if (!passwordEncoder.matches(request.getCurrentPassword(), currentUser.getPasswordHash())) {
+            throw new InvalidCredentialsException();
+        }
+
+        currentUser.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(currentUser);
     }
 }
