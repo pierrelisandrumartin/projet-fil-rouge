@@ -1,5 +1,6 @@
 import type {
   AuthResponse,
+  ChangePasswordRequest,
   LibraryItem,
   LoginRequest,
   RegisterRequest,
@@ -28,7 +29,8 @@ export function clearToken(): void {
 
 async function apiFetch<T>(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  opts: { skipAuthRedirect?: boolean } = {}
 ): Promise<T> {
   const token = getToken();
 
@@ -44,10 +46,12 @@ async function apiFetch<T>(
   });
 
   if (response.status === 401 || response.status === 403) {
-    const wasAuthenticated = getToken() !== null
-    clearToken();
-    if (wasAuthenticated) {
-      window.location.href = "/login"
+    if (!opts.skipAuthRedirect) {
+      const wasAuthenticated = getToken() !== null;
+      clearToken();
+      if (wasAuthenticated) {
+        window.location.href = "/login";
+      }
     }
     throw new Error("Unauthorized");
   }
@@ -119,4 +123,17 @@ export function getTrending(): Promise<WorkSearchResult[]> {
 
 export function getCurrentUser() : Promise<UserResponse> {
   return apiFetch<UserResponse>("/users/me");
+}
+
+export function changePassword(
+  payload: ChangePasswordRequest
+): Promise<AuthResponse> {
+  return apiFetch<AuthResponse>(
+    "/users/me/password",
+    {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    },
+    { skipAuthRedirect: true }
+  );
 }

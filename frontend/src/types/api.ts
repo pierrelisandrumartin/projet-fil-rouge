@@ -48,3 +48,8 @@ export interface UserResponse {
     email: string;
     createdAt: string;
 }
+
+export interface ChangePasswordRequest {
+    currentPassword: string;
+    newPassword: string;
+}

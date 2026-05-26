@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCurrentUser, getMyLibrary } from "../services/api";
+import { changePassword, getCurrentUser, getMyLibrary, setToken } from "../services/api";
 import type { LibraryItem, UserResponse } from "../types/api";
 import { useAuth } from "../context/AuthContext";
 import TopBar from "../components/TopBar";
@@ -19,6 +19,15 @@ function ProfilePage({ onOpenDrawer }: ProfilePageProps) {
   const [library, setLibrary] = useState<LibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Change password form state
+  const [pwOpen, setPwOpen] = useState(false);
+  const [pwCurrent, setPwCurrent] = useState("");
+  const [pwNew, setPwNew] = useState("");
+  const [pwConfirm, setPwConfirm] = useState("");
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwSuccess, setPwSuccess] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -49,6 +58,39 @@ function ProfilePage({ onOpenDrawer }: ProfilePageProps) {
   function handleLogout() {
     logout();
     navigate("/login");
+  }
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwError(null);
+    setPwSuccess(false);
+
+    if (pwNew !== pwConfirm) {
+      setPwError("New password and confirmation do not match.");
+      return;
+    }
+    if (pwNew.length < 8) {
+      setPwError("New password must be at least 8 characters.");
+      return;
+    }
+
+    setPwLoading(true);
+    try {
+      const response = await changePassword({
+        currentPassword: pwCurrent,
+        newPassword: pwNew,
+      });
+      setToken(response.token);
+      setPwSuccess(true);
+      setPwCurrent("");
+      setPwNew("");
+      setPwConfirm("");
+    } catch (err) {
+      console.error(err);
+      setPwError("Current password is incorrect or server error.");
+    } finally {
+      setPwLoading(false);
+    }
   }
 
   // Computed stats
@@ -143,9 +185,65 @@ function ProfilePage({ onOpenDrawer }: ProfilePageProps) {
               <AccountRow
                 icon={<Icon.Lock />}
                 label="Change password"
-                hint="Coming soon"
-                disabled
+                hint={pwOpen ? "Close form" : "Update your password"}
+                onClick={() => {
+                  setPwOpen((v) => !v);
+                  setPwError(null);
+                  setPwSuccess(false);
+                }}
               />
+
+              {pwOpen && (
+                <form
+                  onSubmit={handleChangePassword}
+                  className="p-4 flex flex-col gap-3"
+                  style={{ background: "var(--surface-2)" }}
+                >
+                  <input
+                    type="password"
+                    placeholder="Current password"
+                    value={pwCurrent}
+                    onChange={(e) => setPwCurrent(e.target.value)}
+                    required
+                    className="px-3 py-2 rounded-lg bg-white/5 text-white border border-white/10"
+                  />
+                  <input
+                    type="password"
+                    placeholder="New password (min 8 characters)"
+                    value={pwNew}
+                    onChange={(e) => setPwNew(e.target.value)}
+                    required
+                    className="px-3 py-2 rounded-lg bg-white/5 text-white border border-white/10"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Confirm new password"
+                    value={pwConfirm}
+                    onChange={(e) => setPwConfirm(e.target.value)}
+                    required
+                    className="px-3 py-2 rounded-lg bg-white/5 text-white border border-white/10"
+                  />
+
+                  {pwError && (
+                    <p className="text-[13px] text-red-400" role="alert">
+                      {pwError}
+                    </p>
+                  )}
+                  {pwSuccess && (
+                    <p
+                      className="text-[13px] text-emerald-400"
+                      role="status"
+                    >
+                      Password updated successfully.
+                    </p>
+                  )}
+
+                  <Button type="submit" disabled={pwLoading}>
+                    {pwLoading ? "Updating..." : "Update password"}
+                  </Button>
+                </form>
+              )}
+
               <AccountRow
                 icon={<Icon.Logout />}
                 label="Log out"
