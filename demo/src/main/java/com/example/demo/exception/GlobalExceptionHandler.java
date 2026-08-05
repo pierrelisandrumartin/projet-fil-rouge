@@ -70,6 +70,23 @@ public class GlobalExceptionHandler {
                 return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
 
+        @ExceptionHandler(ExternalApiUnavailableException.class)
+public ResponseEntity<ErrorResponse> handleExternalApiUnavailable(
+        ExternalApiUnavailableException ex,
+        WebRequest request) {
+
+    log.warn("External API unavailable: {}", ex.getMessage());
+
+    ErrorResponse errorResponse = new ErrorResponse(
+            HttpStatus.SERVICE_UNAVAILABLE.value(),
+            "External data source is temporarily unavailable. Please try again later.",
+            "Service Unavailable",
+            LocalDateTime.now(),
+            request.getDescription(false).replace("uri=", ""));
+
+    return new ResponseEntity<>(errorResponse, HttpStatus.SERVICE_UNAVAILABLE);
+}
+
         @ExceptionHandler(RuntimeException.class)
         public ResponseEntity<ErrorResponse> handleRuntimeException(
                         RuntimeException ex,
