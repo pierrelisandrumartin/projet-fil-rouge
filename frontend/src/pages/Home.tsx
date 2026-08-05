@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  ApiError,
   getMyLibrary,
   getTrending,
   importWork,
@@ -37,6 +38,7 @@ function Home({ onOpenDrawer }: HomeProps) {
   // Trending state
   const [trending, setTrending] = useState<WorkSearchResult[]>([]);
   const [trendingLoading, setTrendingLoading] = useState(true);
+  const [serviceUnavailable, setServiceUnavailable] = useState(false);
 
   // Continue reading state
   const [continueReading, setContinueReading] = useState<LibraryItem[]>([]);
@@ -76,6 +78,9 @@ function Home({ onOpenDrawer }: HomeProps) {
         setImportedIds(new Set(jikanIds));
       } catch (err) {
         console.error("Failed to load home data:", err);
+        if (!cancelled && err instanceof ApiError && err.status === 503) {
+          setServiceUnavailable(true);
+        }
       } finally {
         if (!cancelled) setTrendingLoading(false);
       }
@@ -103,7 +108,14 @@ function Home({ onOpenDrawer }: HomeProps) {
       setSearchResults(data);
     } catch (err) {
       console.error("Search failed:", err);
-      setSearchError("Search failed. Please retry.");
+      if (err instanceof ApiError && err.status === 503) {
+        setServiceUnavailable(true);
+        setSearchError(
+          "The manga service is temporarily unavailable. Please try again later.",
+        );
+      } else {
+        setSearchError("Search failed. Please retry.");
+      }
       setSearchResults([]);
     } finally {
       setSearching(false);
@@ -145,6 +157,34 @@ function Home({ onOpenDrawer }: HomeProps) {
         onSearchSubmit={handleSearchSubmit}
         showSearch
       />
+
+      {serviceUnavailable && (
+        <div
+          className="mt-4 p-4 rounded-2xl flex items-start gap-3"
+          style={{
+            background: "color-mix(in oklch, #F59E0B 12%, var(--surface))",
+            border: "1px solid color-mix(in oklch, #F59E0B 40%, transparent)",
+          }}
+          role="alert"
+        >
+          <span className="text-xl shrink-0" aria-hidden="true">
+            ⚠️
+          </span>
+          <div className="flex-1 min-w-0">
+            <div className="font-medium text-white text-[14px]">
+              Manga source temporarily unavailable
+            </div>
+            <div
+              className="text-[13px] mt-0.5"
+              style={{ color: "var(--text-dim)" }}
+            >
+              Our data provider is having issues. Trending and search are
+              unavailable — your library still works. Try again in a few
+              minutes.
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Continue reading — visible only when not searching and there are items */}
       {!isSearchMode && continueReading.length > 0 && (

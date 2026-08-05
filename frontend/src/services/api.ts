@@ -26,7 +26,15 @@ export function clearToken(): void {
 }
 
 // --- Internal HTTP wrapper ---
+export class ApiError extends Error {
+  status: number;
 
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+    this.name = "ApiError";
+  }
+}
 async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
@@ -53,12 +61,12 @@ async function apiFetch<T>(
         window.location.href = "/login";
       }
     }
-    throw new Error("Unauthorized");
+    throw new ApiError(response.status, "Unauthorized");
   }
 
   if (!response.ok) {
     const errorBody = await response.text();
-    throw new Error(`API error ${response.status}: ${errorBody}`);
+    throw new ApiError(response.status, errorBody);
   }
 
   if (response.status === 204) {
