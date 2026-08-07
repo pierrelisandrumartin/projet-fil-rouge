@@ -44,8 +44,8 @@ function Home({ onOpenDrawer }: HomeProps) {
   const [continueReading, setContinueReading] = useState<LibraryItem[]>([]);
 
   // Library sync (importedIds + continue reading)
-  const [importedIds, setImportedIds] = useState<Set<number>>(new Set());
-  const [importingId, setImportingId] = useState<number | null>(null);
+  const [importedIds, setImportedIds] = useState<Set<string>>(new Set());
+  const [importingId, setImportingId] = useState<string | null>(null);
 
   // Filter
   const [activeCategory, setActiveCategory] = useState("all");
@@ -72,10 +72,10 @@ function Home({ onOpenDrawer }: HomeProps) {
         );
         setContinueReading(reading);
 
-        const jikanIds = library
-          .filter((item) => item.source === "jikan" && item.externalId !== null)
-          .map((item) => item.externalId as number);
-        setImportedIds(new Set(jikanIds));
+        const importedKeys = library
+          .filter((item) => item.source !== null && item.externalId !== null)
+          .map((item) => `${item.source}-${item.externalId}`);
+        setImportedIds(new Set(importedKeys));
       } catch (err) {
         console.error("Failed to load home data:", err);
         if (!cancelled && err instanceof ApiError && err.status === 503) {
@@ -123,11 +123,11 @@ function Home({ onOpenDrawer }: HomeProps) {
   }
 
   async function handleImport(work: WorkSearchResult) {
-    if (work.source !== "jikan" || work.externalId === null) return;
-    setImportingId(work.externalId);
+    const key = `${work.source}-${work.externalId}`;
+    setImportingId(key);
     try {
       await importWork(work.externalId, work.source);
-      setImportedIds((prev) => new Set(prev).add(work.externalId!));
+      setImportedIds((prev) => new Set(prev).add(key));
     } catch (err) {
       console.error("Import failed:", err);
       alert("Import failed. Please retry.");
@@ -255,13 +255,13 @@ function Home({ onOpenDrawer }: HomeProps) {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5 mt-6 md:mt-8">
             {filteredGrid.map((work) => {
-              const isJikan = work.source === "jikan" && work.externalId !== null;
-              const isImporting = isJikan && importingId === work.externalId;
-              const isImported = isJikan && importedIds.has(work.externalId!);
+              const key = `${work.source}-${work.externalId}`;
+              const isImporting = importingId === key;
+              const isImported = importedIds.has(key);
 
               return (
                 <article
-                  key={`${work.source}-${work.externalId ?? work.externalIdStr}`}
+                  key={`${work.source}-${work.externalId}`}
                   className="flex flex-col group"
                 >
                   <button
@@ -288,27 +288,17 @@ function Home({ onOpenDrawer }: HomeProps) {
                     <span
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (isJikan && !isImported && !isImporting)
-                          handleImport(work);
+                        if (!isImported && !isImporting) handleImport(work);
                       }}
                       role="button"
                       tabIndex={0}
-                      aria-label={
-                        !isJikan
-                          ? "MangaDex import coming soon"
-                          : isImported
-                            ? "Already added"
-                            : "Add to list"
-                      }
-                      title={
-                        !isJikan ? "MangaDex import coming soon" : undefined
-                      }
+                      aria-label={isImported ? "Already added" : "Add to list"}
                       className={`absolute right-3 bottom-3 inline-flex items-center justify-center rounded-full w-11 h-11
                                  transition-all duration-200 active:scale-95 hover:scale-[1.05]
                                  opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0
-                                 ${!isJikan || isImported || isImporting ? "opacity-50 cursor-default" : "cursor-pointer"}`}
+                                 ${isImported || isImporting ? "opacity-50 cursor-default" : "cursor-pointer"}`}
                       style={
-                        !isJikan || isImported
+                        isImported
                           ? {
                               background: "var(--surface-2)",
                               border: "1px solid var(--border)",
@@ -322,13 +312,7 @@ function Home({ onOpenDrawer }: HomeProps) {
                             }
                       }
                     >
-                      {!isJikan ? (
-                        <Icon.Lock />
-                      ) : isImported ? (
-                        <Icon.Check />
-                      ) : (
-                        <Icon.Plus />
-                      )}
+                      {isImported ? <Icon.Check /> : <Icon.Plus />}
                     </span>
                   </button>
 
@@ -369,14 +353,13 @@ function Home({ onOpenDrawer }: HomeProps) {
             ? {
                 kind: "search",
                 work: selectedWork,
-                inLibrary:
-                  selectedWork.source === "jikan" &&
-                  selectedWork.externalId !== null &&
-                  importedIds.has(selectedWork.externalId),
+                inLibrary: importedIds.has(
+                  `${selectedWork.source}-${selectedWork.externalId}`,
+                ),
                 onAdd: () => handleImport(selectedWork),
                 adding:
-                  selectedWork.source === "jikan" &&
-                  importingId === selectedWork.externalId,
+                  importingId ===
+                  `${selectedWork.source}-${selectedWork.externalId}`,
               }
             : null
         }

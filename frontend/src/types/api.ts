@@ -15,8 +15,7 @@ export interface AuthResponse {
 }
 
 export interface WorkSearchResult {
-    externalId: number | null;
-    externalIdStr: number | null;
+    externalId: string;
     source: string;
     title: string;
     titleEnglish: string | null;
@@ -31,7 +30,7 @@ export interface WorkSearchResult {
 export interface LibraryItem {
   progressId: number;
   workId: number;
-  externalId: number | null;
+  externalId: string | null;
   source: string | null;
   title: string;
   synopsis: string;
@@ -41,7 +40,7 @@ export interface LibraryItem {
   totalVolumes: number;
   totalChapters: number;
   currentVolume: number;
-  currentChapter: number;   
+  currentChapter: number;
 }
 
 export interface UserResponse {

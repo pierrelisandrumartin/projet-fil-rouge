@@ -97,7 +97,7 @@ export function searchWorks(query: string): Promise<WorkSearchResult[]> {
   return apiFetch<WorkSearchResult[]>(`/works/search?${params.toString()}`);
 }
 
-export function importWork(externalId: number, source: string): Promise<unknown> {
+export function importWork(externalId: string, source: string): Promise<unknown> {
   return apiFetch<unknown>("/works/import", {
     method: "POST",
     body: JSON.stringify({ externalId, source }),
