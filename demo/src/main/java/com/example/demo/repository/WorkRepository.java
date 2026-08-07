@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface WorkRepository extends JpaRepository<Work, Integer> {
-    Optional<Work> findByExternalIdAndSource(Integer externalId, String source);
+    Optional<Work> findByExternalIdAndSource(String externalId, String source);
     
 } 

@@ -21,7 +21,7 @@ public class Work {
     private int id;
 
     @Column(name = "external_id")
-    private Integer externalId;
+    private String externalId;
 
     private String source;
 

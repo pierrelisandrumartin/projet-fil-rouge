@@ -68,8 +68,7 @@ public class WorkSearchService {
         }
 
         return new WorkSearchResult(
-                manga.getMalId(),
-                null,
+                String.valueOf(manga.getMalId()),
                 "jikan",
                 manga.getTitle(),
                 manga.getTitleEnglish(),
@@ -102,7 +101,6 @@ public class WorkSearchService {
         String coverUrl = buildCoverUrl(manga);
 
         return new WorkSearchResult(
-                null,
                 manga.getId(),
                 "mangadex",
                 title,

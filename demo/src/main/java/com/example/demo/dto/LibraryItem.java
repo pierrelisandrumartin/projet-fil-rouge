@@ -11,7 +11,7 @@ public class LibraryItem {
 
     private int progressId;
     private int workId;
-    private Integer externalId;
+    private String externalId;
     private String source;
     private String title;
     private String synopsis;

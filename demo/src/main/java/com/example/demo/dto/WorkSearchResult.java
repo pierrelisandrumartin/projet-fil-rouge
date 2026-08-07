@@ -8,10 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkSearchResult {
-    
-    private Integer externalId;
-    private String externalIdStr;
-    private String source;
+
+    private String externalId;       // Jikan (MAL id as string) or MangaDex (UUID)
+    private String source;           // "jikan" or "mangadex"
     private String title;
     private String titleEnglish;
     private String synopsis;

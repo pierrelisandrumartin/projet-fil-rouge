@@ -47,15 +47,15 @@ class WorkImportServiceTest {
     void importFromJikan_shouldReturnExistingWork_whenAlreadyImported() {
         Work existingWork = new Work();
         existingWork.setId(10);
-        existingWork.setExternalId(42);
+        existingWork.setExternalId("42");
         existingWork.setSource("jikan");
 
-        when(workRepository.findByExternalIdAndSource(42, "jikan"))
+        when(workRepository.findByExternalIdAndSource("42", "jikan"))
                 .thenReturn(Optional.of(existingWork));
         when(progressRepository.existsByUserAndWork(user, existingWork))
                 .thenReturn(true);
 
-        Work result = workImportService.importFromJikan(42, user);
+        Work result = workImportService.importFromJikan("42", user);
 
         assertThat(result).isEqualTo(existingWork);
         verify(jikanClient, never()).getMangaById(any(Integer.class));
@@ -64,11 +64,11 @@ class WorkImportServiceTest {
 
     @Test
     void importFromJikan_shouldThrow_whenMangaNotFoundOnJikan() {
-        when(workRepository.findByExternalIdAndSource(999, "jikan"))
+        when(workRepository.findByExternalIdAndSource("999", "jikan"))
                 .thenReturn(Optional.empty());
         when(jikanClient.getMangaById(999)).thenReturn(null);
 
-        assertThatThrownBy(() -> workImportService.importFromJikan(999, user))
+        assertThatThrownBy(() -> workImportService.importFromJikan("999", user))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Manga not found");
 
