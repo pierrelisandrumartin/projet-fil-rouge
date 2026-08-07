@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MangaDexRelationshipAttributes {
-    private String fileName;   // for cover_art
-    private String name;       // for author
+public class MangaDexMangaResponse {
+    private MangaDexManga data;
 }

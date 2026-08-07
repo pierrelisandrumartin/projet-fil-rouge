@@ -69,14 +69,18 @@ public class WorkController {
     @PostMapping("/import")
     public ResponseEntity<Work> importWork(@Valid @RequestBody ImportRequest request,
             Authentication authentication) {
-        if (!"jikan".equals(request.getSource())) {
-            throw new RuntimeException("Source not supported: " + request.getSource());
-        }
-
         String email = authentication.getName();
         User currentUser = userService.findByEmail(email);
 
-        Work imported = workImportService.importFromJikan(request.getExternalId(), currentUser);
+        Work imported;
+        if ("jikan".equals(request.getSource())) {
+            imported = workImportService.importFromJikan(request.getExternalId(), currentUser);
+        } else if ("mangadex".equals(request.getSource())) {
+            imported = workImportService.importFromMangaDex(request.getExternalId(), currentUser);
+        } else {
+            throw new RuntimeException("Source not supported: " + request.getSource());
+        }
+
         return ResponseEntity.ok(imported);
     }
 
