@@ -11,19 +11,27 @@ import java.util.Date;
 
 @Service
 public class JwtService {
+
+    private static final long SHORT_TTL_MILLIS = 3600_000L;              // 1 hour
+    private static final long LONG_TTL_MILLIS = 30L * 24 * 3600_000L;    // 30 days
+
     @Value("${jwt.secret}")
     private String secret;
-    private final long expirationMillis = 3600000; // 1 hour
 
     private Key getkey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String generateToken(String email) {
+        return generateToken(email, false);
+    }
+
+    public String generateToken(String email, boolean rememberMe) {
+        long ttl = rememberMe ? LONG_TTL_MILLIS : SHORT_TTL_MILLIS;
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
+                .setExpiration(new Date(System.currentTimeMillis() + ttl))
                 .signWith(getkey(), SignatureAlgorithm.HS256)
                 .compact();
     }

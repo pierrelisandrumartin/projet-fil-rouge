@@ -13,6 +13,7 @@ function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +22,7 @@ function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      await login({ email, password });
+      await login({ email, password, rememberMe });
       navigate("/");
     } catch (err) {
       console.error("Login failed:", err);
@@ -83,6 +84,19 @@ function LoginPage() {
           placeholder="••••••••"
           required
         />
+
+        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            className="w-4 h-4 rounded accent-current cursor-pointer"
+            style={{ accentColor: "var(--accent)" }}
+          />
+          <span className="text-[13px]" style={{ color: "var(--text-dim)" }}>
+            Keep me signed in for 30 days
+          </span>
+        </label>
 
         {error && (
           <p className="text-red-400 text-sm" role="alert">
