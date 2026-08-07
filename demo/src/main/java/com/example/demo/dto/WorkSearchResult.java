@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WorkSearchResult {
     
-    private int externalId;
+    private Integer externalId;
+    private String externalIdStr;
     private String source;
     private String title;
     private String titleEnglish;

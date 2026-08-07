@@ -13,4 +13,12 @@ public class HttpClientConfig {
                 .baseUrl("https://api.jikan.moe/v4")
                 .build();
     }
+
+    @Bean 
+    public RestClient mangaDexRestClient() {
+        return RestClient.builder()
+            .baseUrl("https://api.mangadex.org")
+            .defaultHeader("User-Agent", "Yomi/1.0")
+            .build();
+    }
 }
