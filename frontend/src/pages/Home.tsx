@@ -123,10 +123,11 @@ function Home({ onOpenDrawer }: HomeProps) {
   }
 
   async function handleImport(work: WorkSearchResult) {
+    if (work.source !== "jikan" || work.externalId === null) return;
     setImportingId(work.externalId);
     try {
       await importWork(work.externalId, work.source);
-      setImportedIds((prev) => new Set(prev).add(work.externalId));
+      setImportedIds((prev) => new Set(prev).add(work.externalId!));
     } catch (err) {
       console.error("Import failed:", err);
       alert("Import failed. Please retry.");
@@ -254,12 +255,13 @@ function Home({ onOpenDrawer }: HomeProps) {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5 mt-6 md:mt-8">
             {filteredGrid.map((work) => {
-              const isImporting = importingId === work.externalId;
-              const isImported = importedIds.has(work.externalId);
+              const isJikan = work.source === "jikan" && work.externalId !== null;
+              const isImporting = isJikan && importingId === work.externalId;
+              const isImported = isJikan && importedIds.has(work.externalId!);
 
               return (
                 <article
-                  key={`${work.source}-${work.externalId}`}
+                  key={`${work.source}-${work.externalId ?? work.externalIdStr}`}
                   className="flex flex-col group"
                 >
                   <button
@@ -286,19 +288,27 @@ function Home({ onOpenDrawer }: HomeProps) {
                     <span
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (!isImported && !isImporting) handleImport(work);
+                        if (isJikan && !isImported && !isImporting)
+                          handleImport(work);
                       }}
                       role="button"
                       tabIndex={0}
                       aria-label={
-                        isImported ? "Already added" : "Add to list"
+                        !isJikan
+                          ? "MangaDex import coming soon"
+                          : isImported
+                            ? "Already added"
+                            : "Add to list"
+                      }
+                      title={
+                        !isJikan ? "MangaDex import coming soon" : undefined
                       }
                       className={`absolute right-3 bottom-3 inline-flex items-center justify-center rounded-full w-11 h-11
                                  transition-all duration-200 active:scale-95 hover:scale-[1.05]
                                  opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0
-                                 ${isImported || isImporting ? "opacity-50 cursor-default" : "cursor-pointer"}`}
+                                 ${!isJikan || isImported || isImporting ? "opacity-50 cursor-default" : "cursor-pointer"}`}
                       style={
-                        isImported
+                        !isJikan || isImported
                           ? {
                               background: "var(--surface-2)",
                               border: "1px solid var(--border)",
@@ -312,7 +322,13 @@ function Home({ onOpenDrawer }: HomeProps) {
                             }
                       }
                     >
-                      {isImported ? <Icon.Check /> : <Icon.Plus />}
+                      {!isJikan ? (
+                        <Icon.Lock />
+                      ) : isImported ? (
+                        <Icon.Check />
+                      ) : (
+                        <Icon.Plus />
+                      )}
                     </span>
                   </button>
 
@@ -353,9 +369,14 @@ function Home({ onOpenDrawer }: HomeProps) {
             ? {
                 kind: "search",
                 work: selectedWork,
-                inLibrary: importedIds.has(selectedWork.externalId),
+                inLibrary:
+                  selectedWork.source === "jikan" &&
+                  selectedWork.externalId !== null &&
+                  importedIds.has(selectedWork.externalId),
                 onAdd: () => handleImport(selectedWork),
-                adding: importingId === selectedWork.externalId,
+                adding:
+                  selectedWork.source === "jikan" &&
+                  importingId === selectedWork.externalId,
               }
             : null
         }

@@ -14,7 +14,8 @@ export interface AuthResponse {
 }
 
 export interface WorkSearchResult {
-    externalId: number;
+    externalId: number | null;
+    externalIdStr: number | null;
     source: string;
     title: string;
     titleEnglish: string | null;
