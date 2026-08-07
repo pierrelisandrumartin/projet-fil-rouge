@@ -14,7 +14,9 @@ logs.txt
 Thumbs.db
 
 # Env
+.env
 .env.local
+.env.*.local
 
 # Frontend build artifacts
 frontend/dist/
