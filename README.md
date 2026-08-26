@@ -1,5 +1,7 @@
 #  Yomi — Reading Tracker
 
+[![Backend Tests](https://github.com/pierrelisandrumartin/projet-fil-rouge/actions/workflows/backend-tests.yml/badge.svg)](https://github.com/pierrelisandrumartin/projet-fil-rouge/actions/workflows/backend-tests.yml)
+
 > Track what you're reading across manga, manhwa, manhua and light novels — with graceful fallback when your data source goes down.
 
 Yomi is a full-stack reading tracker built as a training project (RNCP 6). It emphasizes real-world engineering concerns: resilience against flaky external APIs, defense-in-depth security, and a clean architectural boundary between concerns.
