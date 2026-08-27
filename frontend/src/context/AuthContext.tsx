@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import {
   login as apiLogin,
@@ -19,11 +19,9 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-
-  useEffect(() => {
-    setIsAuthenticated(getToken() !== null);
-  }, []);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+    () => getToken() !== null,
+  );
 
   async function login(payload: LoginRequest) {
     const response = await apiLogin(payload);
