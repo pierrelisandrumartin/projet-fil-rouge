@@ -25,6 +25,7 @@ function Cover({
           src={src}
           alt={`${title} cover`}
           loading="lazy"
+          referrerPolicy="no-referrer"
           className="absolute inset-0 w-full h-full object-cover"
         />
       ) : (
