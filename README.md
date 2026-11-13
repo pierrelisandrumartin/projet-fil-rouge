@@ -11,6 +11,12 @@ Yomi is a full-stack reading tracker built as a training project (RNCP 6). It em
 
 ---
 
+## 🌐 Live
+
+- **App** — https://yomi-app.fr
+- **API docs** — https://yomi-app.fr/swagger-ui.html
+- **Status** — https://stats.uptimerobot.com/<https://stats.uptimerobot.com/x0my01ABBq>
+
 ##  Features
 
 **Discovery & Library**
