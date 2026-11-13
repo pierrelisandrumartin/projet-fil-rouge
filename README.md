@@ -245,3 +245,5 @@ Technical concepts learned during this project are documented in a companion Not
 ##  Author
 
 **Pierre M.** — Full-stack training, RNCP Level 6 project.
+
+Last deploy: auto via GitHub Actions 
