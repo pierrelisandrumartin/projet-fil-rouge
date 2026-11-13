@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 interface CoverProps {
   src?: string | null;
   title: string;
@@ -14,22 +16,26 @@ function Cover({
   showTypeBadge = true,
 }: CoverProps) {
   const hue = hashHue(title);
+  const [failed, setFailed] = useState(false);
+
+  const showProcedural = !src || failed;
 
   return (
     <div
       className={`relative overflow-hidden ${className}`}
       style={{ borderRadius: "inherit", aspectRatio: "2 / 3" }}
     >
-      {src ? (
+      {showProcedural ? (
+        <ProceduralCover title={title} hue={hue} />
+      ) : (
         <img
-          src={src}
+          src={src!}
           alt={`${title} cover`}
           loading="lazy"
           referrerPolicy="no-referrer"
+          onError={() => setFailed(true)}
           className="absolute inset-0 w-full h-full object-cover"
         />
-      ) : (
-        <ProceduralCover title={title} hue={hue} />
       )}
 
       {showTypeBadge && type && (
