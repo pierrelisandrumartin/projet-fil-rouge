@@ -18,7 +18,13 @@ function Cover({
   const hue = hashHue(title);
   const [failed, setFailed] = useState(false);
 
-  const showProcedural = !src || failed;
+  // Proxy MangaDex covers through our nginx to bypass anti-hotlinking (403)
+  const proxiedSrc = src?.replace(
+    "https://uploads.mangadex.org/covers/",
+    "/md-covers/",
+  );
+
+  const showProcedural = !proxiedSrc || failed;
 
   return (
     <div
@@ -29,7 +35,7 @@ function Cover({
         <ProceduralCover title={title} hue={hue} />
       ) : (
         <img
-          src={src!}
+          src={proxiedSrc!}
           alt={`${title} cover`}
           loading="lazy"
           referrerPolicy="no-referrer"
