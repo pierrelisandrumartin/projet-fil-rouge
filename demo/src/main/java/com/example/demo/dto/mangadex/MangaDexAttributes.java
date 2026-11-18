@@ -7,9 +7,10 @@ import java.util.Map;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MangaDexAttributes {
-    private Map<String, String> title;        
-    private Map<String, String> description;  
-    private String status;                   
-    private String lastVolume;               
-    private String lastChapter;                
+    private Map<String, String> title;
+    private Map<String, String> description;
+    private String status;
+    private String lastVolume;
+    private String lastChapter;
+    private String originalLanguage;  // "ja" (manga), "ko" (manhwa), "zh"/"zh-hk" (manhua)
 }

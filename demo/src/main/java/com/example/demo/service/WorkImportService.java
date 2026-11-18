@@ -140,7 +140,9 @@ public class WorkImportService {
         Integer volumes = parseIntSafe(attrs != null ? attrs.getLastVolume() : null);
 
         Author author = findOrCreateAuthor(extractMangaDexAuthorName(manga));
-        Category category = findOrCreateCategory("Manga");
+        String typeLabel = WorkSearchService.mapMangaDexType(
+                attrs != null ? attrs.getOriginalLanguage() : null);
+        Category category = findOrCreateCategory(typeLabel);
 
         Work work = new Work();
         work.setExternalId(manga.getId());

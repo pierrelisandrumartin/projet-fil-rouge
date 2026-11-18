@@ -101,6 +101,7 @@ public class WorkSearchService {
         String status = (manga.getAttributes() != null) ? manga.getAttributes().getStatus() : null;
         Integer chapters = parseIntSafe(manga.getAttributes() != null ? manga.getAttributes().getLastChapter() : null);
         Integer volumes = parseIntSafe(manga.getAttributes() != null ? manga.getAttributes().getLastVolume() : null);
+        String type = mapMangaDexType(manga.getAttributes() != null ? manga.getAttributes().getOriginalLanguage() : null);
         String coverUrl = buildCoverUrl(manga);
 
         return new WorkSearchResult(
@@ -112,9 +113,22 @@ public class WorkSearchService {
                 chapters,
                 volumes,
                 status,
-                "Manga",
+                type,
                 coverUrl
         );
+    }
+
+    /**
+     * Mappe la langue d'origine MangaDex vers la catégorie Yomi.
+     * ja (japonais) → Manga ; ko (coréen) → Manhwa ; zh* (chinois) → Manhua.
+     */
+    static String mapMangaDexType(String originalLanguage) {
+        if (originalLanguage == null) return "Manga";
+        return switch (originalLanguage.toLowerCase()) {
+            case "ko" -> "Manhwa";
+            case "zh", "zh-hk", "zh-ro" -> "Manhua";
+            default -> "Manga";
+        };
     }
 
     private String pickLocalized(Map<String, String> localized, String fallback) {
