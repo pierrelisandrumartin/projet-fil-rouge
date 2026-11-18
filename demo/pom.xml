@@ -109,6 +109,18 @@
     <artifactId>spring-boot-webmvc-test</artifactId>
     <scope>test</scope>
 </dependency>
+
+<!-- Spring Cache -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-cache</artifactId>
+</dependency>
+
+<!-- Caffeine : cache en mémoire avec TTL -->
+<dependency>
+    <groupId>com.github.ben-manes.caffeine</groupId>
+    <artifactId>caffeine</artifactId>
+</dependency>
   
   </dependencies>
 

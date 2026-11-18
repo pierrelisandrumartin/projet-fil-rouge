@@ -11,6 +11,7 @@ import com.example.demo.dto.mangadex.MangaDexSearchResponse;
 import com.example.demo.exception.ExternalApiUnavailableException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class WorkSearchService {
         this.mangaDexClient = mangaDexClient;
     }
 
+    @Cacheable(value = "search", key = "#query.toLowerCase()")
     public List<WorkSearchResult> search(String query) {
         try {
             JikanSearchResponse response = jikanClient.searchManga(query);
@@ -39,6 +41,7 @@ public class WorkSearchService {
         }
     }
 
+    @Cacheable("trending")
     public List<WorkSearchResult> getTrending() {
         try {
             JikanSearchResponse response = jikanClient.getTopManga();

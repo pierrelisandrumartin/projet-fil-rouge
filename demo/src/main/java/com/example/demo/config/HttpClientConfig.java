@@ -13,8 +13,8 @@ public class HttpClientConfig {
     @Bean
     public RestClient jikanRestClient() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(Duration.ofSeconds(5));
-        factory.setReadTimeout(Duration.ofSeconds(5));
+        factory.setConnectTimeout(Duration.ofSeconds(2));
+        factory.setReadTimeout(Duration.ofSeconds(2));
 
         return RestClient.builder()
                 .baseUrl("https://api.jikan.moe/v4")
